@@ -1,11 +1,14 @@
 public class Node{
 
    ArrayList<Node> neighboors;
+   ArrayList<Critter> tenants;
    int x,y;
    int h;
+   public boolean visited;
    
    public Node(){
      neighboors = new ArrayList<Node>();
+     tenants = new ArrayList<Critter>();
      h = 0;
      x = -1;
      y = -1;
@@ -13,6 +16,7 @@ public class Node{
    
    public Node(int x, int y){
      neighboors = new ArrayList<Node>();
+     tenants = new ArrayList<Critter>();
      h = 0;
      this.x = x;
      this.y = y;
@@ -20,6 +24,7 @@ public class Node{
    
    public Node(ArrayList<Node> neighboors){
      this.neighboors = neighboors;
+     tenants = new ArrayList<Critter>();
      h = 0;
      x = -1;
      y = -1;
@@ -27,6 +32,7 @@ public class Node{
    
    public Node(ArrayList<Node> neighboors, int h){
      this.neighboors = neighboors;
+     tenants = new ArrayList<Critter>();
      this.h = h;
      x = -1;
      y = -1;
@@ -65,6 +71,25 @@ public class Node{
    public void addNeighboor(Node n){
       neighboors.add(n);
    }
+   
+   public void addTenant(Critter c){
+     tenants.add(c);
+   }
+    public void removeTenant(Critter c){
+     if(hasTenant(c)){
+       tenants.remove(c);
+     }
+   }
+   
+   public ArrayList<Critter> getTenants(){
+     return tenants;
+   }
+   
+   public boolean hasTenant(Critter c){
+     return tenants.contains(c);
+   }
+   
+   
    
    public String toString(){
      return "Node: @- (" + x + "," + y + ") h- "+h;

@@ -28,6 +28,7 @@ public class Critter{
   
   public Critter(Node pos){
     this.pos = pos;
+    //pos.addTenant(this);
     steps = 0;
     max_steps = 50;
     speed = 9;
@@ -36,17 +37,10 @@ public class Critter{
   public void move(){
     steps++;
     if(steps%(10-speed)==0){
-      pos = getNextPost1();
+      pos.removeTenant(this);
+      pos = pos.getRandomNeighboor();
+      pos.addTenant(this);
     }
   }
   
-  public Node getNextPost1(){
-    return pos.getRandomNeighboor();
-  }
-  
-  public Node getNextPost2(){
-    return pos.getNeighboor(0);
-  }
-  
-
 }

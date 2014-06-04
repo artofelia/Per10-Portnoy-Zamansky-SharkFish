@@ -5,6 +5,7 @@ static int w,h;
 static float spx, spy;
 
 static ArrayList<Critter> c;
+static ArrayList<Shark> s;
 
 
 void setup() {
@@ -17,11 +18,15 @@ void setup() {
   carveGrid(100);
   
   c = new ArrayList<Critter>();
+  s = new ArrayList<Shark>();
   
   for(int i = 0; i < 10; i++){
     c.add(new Critter(
     g.getSpot((int)random(g.getSize()))
     ));
+  }
+  for(int i=0; i<4; i++){
+   s.add(new Shark(g.getSpot((int)random(g.getSize())))); 
   }
 }
 
@@ -71,5 +76,13 @@ void draw() {
      ellipse(x,y,spx,spy);
      c.get(i).move();  
   }
+  fill(0,0,255);
+  for(int i=0; i<s.size(); i++){
+   float x=s.get(i).getX()*spx+spx/2;
+   float y=s.get(i).getY()*spy+spy/2;
+   ellipse(x,y,spx,spy);
+   s.get(i).move(g.getSpot(0,0));
+  }
+  
   
 }
