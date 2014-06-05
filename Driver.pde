@@ -38,7 +38,7 @@ void setup() {
     g.getSpot((int)random(g.getSize()))
     ));
   }
-  for(int i=0; i< 51; i++){
+  for(int i=0; i< 5; i++){
    s.add(new Shark(g.getSpot((int)random(g.getSize())))); 
   }
 }
@@ -52,13 +52,13 @@ public void carveGrid(int max){
 }
 
 void draw() {
-  background(255,255,255);
+  background(20);
   
   //draw grid
   strokeWeight(1);
   stroke(0,0,0);
   for(int i = 0; i < g.getSize(); i++){
-    fill(200,200,200);
+    fill(50,50,200);
     rect(g.getSpotXPix(i), g.getSpotYPix(i), spx, spy);
     //fill(0); 
     //text(g.getSpotX(i) + ", "+  g.getSpotY(i), x+spx/2,y+spy/2);
@@ -81,20 +81,24 @@ void draw() {
   */
   
   //draw critter
-  fill(255,0,0);
+  fill(100,200,100);
   for(int i = 0; i < f.size(); i++){
      float x = f.get(i).getX()*spx+spx/2;
      float y = f.get(i).getY()*spy+spy/2;
      ellipse(x,y,spx,spy);
-     f.get(i).move();  
+     f.get(i).move(f);  
+     if(f.get(i).eaten)f.remove(i);
   }
-  fill(0,0,255);
+  fill(125);
   for(int i=0; i<s.size(); i++){
    float x=s.get(i).getX()*spx+spx/2;
    float y=s.get(i).getY()*spy+spy/2;
    ellipse(x,y,spx,spy);
-   s.get(i).move(f);
+   s.get(i).move(f,s);
+   if(s.get(i).dead)s.remove(i);
   }
+  println("Fish: "+f.size());
+  println("Sharks: "+s.size());
   
   
 }
