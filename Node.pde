@@ -89,6 +89,10 @@ public class Node{
      return tenants.contains(c);
    }
    
+   public int dist(Node n){
+     return abs((x-n.x))+abs((y-n.y));
+   }
+   
    
    
    public String toString(){

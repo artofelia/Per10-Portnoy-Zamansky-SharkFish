@@ -4,8 +4,10 @@ static Grid g;
 static int w,h;
 static float spx, spy;
 
-static ArrayList<Critter> c;
+static ArrayList<Fish> f;
 static ArrayList<Shark> s;
+
+static Node test;
 
 
 void setup() {
@@ -17,19 +19,29 @@ void setup() {
   g = new Grid(w,h);
   carveGrid(100);
   
-  c = new ArrayList<Critter>();
+  f = new ArrayList<Fish>();
   s = new ArrayList<Shark>();
   
-  for(int i = 0; i < 10; i++){
-    c.add(new Critter(
+  test = g.getSpot(50,50);
+  
+//  Shark st = new Shark(g.getSpot(0,0));
+//  ArrayList<Node> path = st.breadth(st.getPos(), test);
+//  println("path");
+//  if(path!=null){
+//    for(Node n: path){
+//      println(n);
+//    }
+//  }
+  
+  for(int i = 0; i < 50; i++){
+    f.add(new Fish(
     g.getSpot((int)random(g.getSize()))
     ));
   }
-  for(int i=0; i<4; i++){
+  for(int i=0; i< 51; i++){
    s.add(new Shark(g.getSpot((int)random(g.getSize())))); 
   }
 }
-
 
 public void carveGrid(int max){
   for(int i = 0; i < max; i++){
@@ -70,18 +82,18 @@ void draw() {
   
   //draw critter
   fill(255,0,0);
-  for(int i = 0; i < c.size(); i++){
-     float x = c.get(i).getX()*spx+spx/2;
-     float y = c.get(i).getY()*spy+spy/2;
+  for(int i = 0; i < f.size(); i++){
+     float x = f.get(i).getX()*spx+spx/2;
+     float y = f.get(i).getY()*spy+spy/2;
      ellipse(x,y,spx,spy);
-     c.get(i).move();  
+     f.get(i).move();  
   }
   fill(0,0,255);
   for(int i=0; i<s.size(); i++){
    float x=s.get(i).getX()*spx+spx/2;
    float y=s.get(i).getY()*spy+spy/2;
    ellipse(x,y,spx,spy);
-   s.get(i).move(g.getSpot(0,0));
+   s.get(i).move(f);
   }
   
   
