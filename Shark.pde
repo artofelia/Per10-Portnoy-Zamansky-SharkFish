@@ -2,59 +2,46 @@ import java.util.*;
 
 public class Shark extends Critter{
   
-  int sight;
-  int hunger;
-  
-  public boolean dead;
   
   public Shark(Node pos){
    super(pos); 
-   sight = 20;
-   hunger=0;
-   dead=false;
+   sight = 50;
+   hunger = 101;
+   sexDrive = 201;
+   speed = 8;
+   println("init");
   }
   
-  public Shark(Node pos,int hunger, int season){
-    super(pos);
-    sight=20;
-    this.hunger=hunger;
-    dead=false;
-    this.season=season;
-    this.seasoned=true;
+  public Shark(Node pos, int speed, int sex, float sight, float max_age, float max_hunger){
+   super(pos, speed, sex, sight, max_age, max_hunger);
+   sight = 10;
   }
-/*  
-  public ArrayList<Node> depth(Node st, Node finish){
-    ArrayList<Node> path = new ArrayList<Node>();
-    path.add(st);
-    return depth(finish, path);
-  }
-  public ArrayList<Node> depth(Node finish, ArrayList<Node> path){
-    if(path.size()>sight) return null;
-    Node l = path.get(path.size()-1);
-    if(l.equals(finish)) return path;
-    Node s = path.get(0);
+
+  public void repro(){
+    if(sexDrive<50 || age<500 || random(100)<40) return;
+    sexDrive=0;
+    int nspeed = speed + (int) (random(4)-2);
+    if(nspeed < 1) {nspeed = 1;}
     
-    for(Node n: s.getNeighboors()){
-      if(!path.contains(n)){
-        ArrayList<Node> newPath = path;
-        newPath.add(n);
-        return depth(finish, newPath);
-      }
-    }
-    return null;
-  }
-  */
-  
-  public String stringList(ArrayList<Node> list){
-    String s = "";
-   for(Node n: list){
-      s+=n.toString();
-    }
-    return s;
+    if(nspeed > max_speed) {nspeed = max_speed;}
+    
+    Shark sr = new Shark(
+    pos,
+    nspeed, 
+    -1,
+    max_age + mutation(max_age),
+    max_hunger + mutation(max_hunger),
+    sight + mutation(sight)
+    );
+    
+    sr.hunger=mutation(hunger+20);
+    hunger+=10;
+    Driver.s.add(sr);
   }
   
-  public Node findClosestFish(ArrayList<Fish> f){
-    int mdist = sight+1;
+  
+  public Node findFood(ArrayList<Fish> f){
+    int mdist = (int)sight+1;
     Node fin = new Node();
     
     for(Fish fs: f){
@@ -70,78 +57,81 @@ public class Shark extends Critter{
     
   }
   
-  public Fish returnClosestFish(ArrayList<Fish> f){
-    int mdist = sight+1;
-    Fish fin = null;
-    
-    for(Fish fs: f){
-      if((this.pos).dist(fs.getPos()) < mdist){
-        mdist = (this.pos).dist(fs.getPos());
-        fin = fs;
-      }
-    }
-    if(mdist < sight){
-      return fin;
-    }
-    return null;
+   public void checkFood(){
+     Fish ft = new Fish();
+     Fish fs = (Fish)(pos.getTenantType(ft));
+     if(fs!=null){
+       fs.die();
+       println("shark eat");
+       hunger-=150;
+     }
   }
   
-    public Node findClosestShark(ArrayList<Shark> s){
-    int mdist = sight+1;
+  public Node findMate(ArrayList<Shark> s){
+    int mdist = (int)sight+1;
     Node fin = new Node();
     
     for(Shark sk: s){
-      if((this.pos).dist(sk.getPos()) < mdist){
-        mdist = (this.pos).dist(sk.getPos());
-        fin = sk.getPos();
+      if(sk.getSex() != getSex()){
+        if((this.pos).dist(sk.getPos()) < mdist){
+          mdist = (this.pos).dist(sk.getPos());
+          fin = sk.getPos();
+        }
       }
     }
     if(mdist < sight){
       return fin;
     }
     return null;
-    
   }
   
-  
-  
-  public void move(ArrayList<Fish> f,ArrayList<Shark> s){
-    String target="";
-    Node goal=null;
-    if(season>=2000){
-      season=0;
-      seasoned=false;
-    }
-    if(1500<=season && season<=2000 && !seasoned){
-      goal=findClosestShark(s);
-      target="shark";
-      println(season);
-    }
-    if(hunger>1000){
-      goal = findClosestFish(f);
-      target="fish";
-    }
-    if(hunger>2000){
-     dead=true; 
-    }
+   public void move(ArrayList<Fish> f, ArrayList<Shark> s){
+    //println(hunger);
+    updateCharacteristics();
     steps++;
-    if(steps%(10-speed)==0){
-      pos.removeTenant(this);
-      if(goal!=null){
-        ArrayList<Node>path=breadth(pos, goal);
-        if(pos.dist(goal)<=1){
-          if(target.equals("fish"))returnClosestFish(f).eaten=true;
-          if(target.equals("shark"))s.add(new Shark(pos,hunger+50,season));
-          seasoned=true;
-          hunger=0;
+    if((steps/10)%(max_speed+1-speed)==0){
+        
+        if(hunger > 100){
+            path = (breadth(pos, findFood(f)));
+            //println("hunting");
+        }else if(sexDrive > 240 && age>500){
+            path = (breadth(pos, findMate(s)));
+            //println("i want sex");
+        }else{
+           path=null;
+           //println("chillin");
         }
-        pos = path.get(0);
-      }else{
-        pos = pos.getRandomNeighboor();
-      }
-      pos.addTenant(this);
+        checkFood();
     }
-    hunger++;
-    season++;
+    if(steps%(max_speed+1-speed)==0){
+      if(path!=null && path.size()>0){
+        moveOnPath(path);
+        path.remove(0);
+      }
+      else moveTo(pos.getRandomNeighboor());
+    }
   }
+  
+  public void die(){
+    pos.removeTenant(this);
+    Driver.s.remove(this);
+  }
+  
+  public void draw(){
+     if(sex==1){
+       fill(100);
+     }else{
+       fill(200);
+     }
+     rect(pos.getXPix(), pos.getYPix(), Driver.spx, Driver.spy);
+     //printInfo();
+  }
+  
+  void printInfo(){
+     fill(255, 255, 255);
+     text("hunger: " + hunger + 
+     "\nage: " + age, pos.getXPix(),pos.getYPix()+Driver.spy/2);
+  }
+  
 }
+

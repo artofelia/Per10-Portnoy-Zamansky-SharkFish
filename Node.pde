@@ -4,7 +4,20 @@ public class Node{
    ArrayList<Critter> tenants;
    int x,y;
    int h;
-   public boolean visited;
+   boolean visited;
+   int ct;
+   
+   public void update(){
+     ct++;
+     if(ct>10) {
+       visited = false;
+     }
+   }
+   
+   public void visit(){
+     visited = true;
+     ct = 0;
+   }
    
    public Node(){
      neighboors = new ArrayList<Node>();
@@ -52,11 +65,19 @@ public class Node{
      return y;
    }
    
+   public float getXPix(){
+      return x*Driver.spx;
+  }
+  public float getYPix(){
+      return y*Driver.spy;
+  }
+   
    public ArrayList<Node> getNeighboors(){
      return neighboors;
    }
    
    public Node getRandomNeighboor(){
+     if(neighboors.size()==0) return this;
      return getNeighboor((int)random(neighboors.size()));
    }
    
@@ -73,7 +94,9 @@ public class Node{
    }
    
    public void addTenant(Critter c){
-     tenants.add(c);
+     if(!hasTenant(c)){
+       tenants.add(c);
+     }
    }
     public void removeTenant(Critter c){
      if(hasTenant(c)){
@@ -89,8 +112,35 @@ public class Node{
      return tenants.contains(c);
    }
    
+   public Critter getTenantType(Critter c){
+     for(Critter c2: tenants){
+       if(c2.getClass()==c.getClass()){
+         return c2;
+       }
+     }
+     return null;
+   }
+   
+   public boolean hasTenantType(Class cl){
+     for(Critter c: tenants){
+       if(c.getClass()==cl){
+         return true;
+       }
+     }
+     return false;
+   }
+   
    public int dist(Node n){
      return abs((x-n.x))+abs((y-n.y));
+   }
+   
+   public void draw(){
+    if(visited){
+     fill(50,50,100);
+    }else{
+     fill(50,50,150);
+    }
+    rect(getXPix(), getYPix(), Driver.spx, Driver.spy);
    }
    
    

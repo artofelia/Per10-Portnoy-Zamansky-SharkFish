@@ -11,13 +11,6 @@ public class Grid{
     return spots.size();
   }
   
-  public float getSpotXPix(int i){
-      return getSpotX(i)*Driver.spx;
-  }
-  public float getSpotYPix(int i){
-      return getSpotY(i)*Driver.spy;
-  }
-  
   public int getSpotX(int i){
     return getSpot(i).x;
   }
@@ -43,6 +36,15 @@ public class Grid{
     return spots.get(i);
   }
   
+  public void removeSpot(int i){
+    Node n = getSpot(i);
+    if(n==null) return;
+    for(Node m: n.getNeighboors()){
+      m.removeNeighboor(n);
+    }
+    spots.remove(n);
+  }
+  
   public void removeSpot(int x, int y){
     Node n = getSpot(x, y);
     if(n==null) return;
@@ -51,6 +53,22 @@ public class Grid{
     }
     spots.remove(n);
   }
+  
+  public void cleanGrid(){
+  int ct = 1;
+  
+  while(ct!=0){
+    ct = 0;
+    for(int i = 0; i < getSize(); i++){
+      Node n = getSpot(i);
+      if(n.getNeighboors().size()==0){
+        removeSpot(i);
+        ct++;
+      }
+    }
+  
+  }
+}
   
   public Grid(int w, int h){
       this.w = w;

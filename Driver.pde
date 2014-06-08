@@ -1,4 +1,7 @@
+import ddf.minim.*;
 
+AudioPlayer player;
+Minim minim;
 
 static Grid g;
 static int w,h;
@@ -6,62 +9,87 @@ static float spx, spy;
 
 static ArrayList<Fish> f;
 static ArrayList<Shark> s;
+static ArrayList<Algae> a;
 
 static Node test;
+static int time;
+static boolean pause;
 
 
 void setup() {
-  size(1000, 1000);
+  size(800, 800);
+  frameRate(60);
+  
+  minim=new Minim(this);
+  player=minim.loadFile("Fishy.mp3");
+  player.loop();
+  
+  pause = false;
+  time = 0;
   w = 100;
   h = 100;
   spx = width/w;
   spy = height/h;
   g = new Grid(w,h);
-  carveGrid(100);
+  carveGrid(30);
+  g.cleanGrid();
   
   f = new ArrayList<Fish>();
   s = new ArrayList<Shark>();
+  a = new ArrayList<Algae>();
   
-  test = g.getSpot(50,50);
-  
-//  Shark st = new Shark(g.getSpot(0,0));
-//  ArrayList<Node> path = st.breadth(st.getPos(), test);
-//  println("path");
-//  if(path!=null){
-//    for(Node n: path){
-//      println(n);
-//    }
-//  }
-  
-  for(int i = 0; i < 50; i++){
-    f.add(new Fish(
-    g.getSpot((int)random(g.getSize()))
+  //test = g.getSpot(50,50);
+
+  for(int i = 0; i < 100; i++){
+    f.add(new Fish(g.getSpot((int)random(g.getSize()))
     ));
   }
-  for(int i=0; i< 5; i++){
+  for(int i=0; i< 10; i++){
    s.add(new Shark(g.getSpot((int)random(g.getSize())))); 
   }
+  for(int i=0; i< 1000; i++){
+   a.add(new Algae(g.getSpot((int)random(g.getSize())))); 
+  }
 }
+
+
+
+public void generateAlgae(){
+  if(time%10==0){
+    if(random(10)<10){
+      a.add(new Algae(g.getSpot((int)random(g.getSize())))); 
+    }
+  }
+}
+
+
 
 public void carveGrid(int max){
   for(int i = 0; i < max; i++){
     int x = (int)random(w);
     int y = (int)random(h);
-    g.carve(x,y,50,5);
+    g.carve(x,y,80,5);
+  }
+}
+
+void keyPressed() {
+  if(key=='p'){
+     pause = !pause;
   }
 }
 
 void draw() {
-  background(20);
-  
+  background(100,40,50);
+  time++;
+  if(!pause){
+    //generateAlgae();
+  }
   //draw grid
   strokeWeight(1);
   stroke(0,0,0);
   for(int i = 0; i < g.getSize(); i++){
-    fill(50,50,200);
-    rect(g.getSpotXPix(i), g.getSpotYPix(i), spx, spy);
-    //fill(0); 
-    //text(g.getSpotX(i) + ", "+  g.getSpotY(i), x+spx/2,y+spy/2);
+    g.getSpot(i).draw();
+    g.getSpot(i).update();
   }
   
   /*
@@ -80,25 +108,33 @@ void draw() {
   }
   */
   
-  //draw critter
-  fill(100,200,100);
+  for(int i=0; i<a.size(); i++){
+   a.get(i).draw();
+   
+   if(!pause){
+     a.get(i).move();
+   }
+  }
+  
   for(int i = 0; i < f.size(); i++){
-     float x = f.get(i).getX()*spx+spx/2;
-     float y = f.get(i).getY()*spy+spy/2;
-     ellipse(x,y,spx,spy);
-     f.get(i).move(f);  
-     if(f.get(i).eaten)f.remove(i);
+    f.get(i).draw();
+    
+    if(!pause){
+      f.get(i).move(f, a, s); 
+    }
   }
-  fill(125);
+  
   for(int i=0; i<s.size(); i++){
-   float x=s.get(i).getX()*spx+spx/2;
-   float y=s.get(i).getY()*spy+spy/2;
-   ellipse(x,y,spx,spy);
-   s.get(i).move(f,s);
-   if(s.get(i).dead)s.remove(i);
+   s.get(i).draw();
+   
+    if(!pause){
+      s.get(i).move(f, s);
+    }
   }
-  println("Fish: "+f.size());
-  println("Sharks: "+s.size());
   
+   fill(255); 
+   textSize(11);
+   text("Fish: "+  f.size() + "\nSharks: " + s.size() + "\nAlgae: " + a.size(), 15,15);
   
+ 
 }
