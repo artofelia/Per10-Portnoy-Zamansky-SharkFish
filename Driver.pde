@@ -15,6 +15,8 @@ static Node test;
 static int time;
 static boolean pause;
 
+static boolean musicOn=true;
+static boolean visit=false;
 
 void setup() {
   size(800, 800);
@@ -136,5 +138,21 @@ void draw() {
    textSize(11);
    text("Fish: "+  f.size() + "\nSharks: " + s.size() + "\nAlgae: " + a.size(), 15,15);
   
+  if(musicOn)text ("Music On",width-80,15);
+  else text("Music Off",width-80,15);
+  
+ if(visit)text ("Visiting On",width-80,30);
+  else text("Visiting Off",width-80,30);
  
+}
+
+void mouseClicked(){
+   if(width-80<mouseX && mouseX<width && 0<mouseY && mouseY<15){
+    musicOn=!musicOn;
+    if(!musicOn)player.pause();
+    else player.loop();
+   }
+   if(width-80<mouseX && mouseX<width && 15<mouseY && mouseY<30){
+    visit=!visit;
+   }
 }

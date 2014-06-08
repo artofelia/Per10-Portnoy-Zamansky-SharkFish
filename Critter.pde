@@ -181,6 +181,7 @@ public class Critter{
        Node n = nn.get(i);
        if(!path.contains(n) && pos.dist(n)<sight){
           path.add(n);
+          if(Driver.visit)n.visit();
           org.add(ct);
           if(n.equals(finish)){
             found = true;
